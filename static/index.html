@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 AI Tutor - Learn Anything</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #50C878;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .ask-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ask-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .ask-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+            color: #667eea;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .answer-section {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .answer-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+
+        .answer-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .subject-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+
+        .error {
+            background: #ffe6e6;
+            border-left: 4px solid #ff4444;
+            color: #cc0000;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 AI Tutor</h1>
+        <p class="subtitle">Ask me anything! I'll help you learn any subject.</p>
+        
+        <form id="questionForm">
+            <div class="form-group">
+                <label for="subject">📚 Choose Your Subject:</label>
+                <select id="subject" name="subject" required>
+                    <option value="">Select a subject...</option>
+                    <option value="mathematics">📊 Mathematics</option>
+                    <option value="science">🔬 Science</option>
+                    <option value="history">🏛️ History</option>
+                    <option value="literature">📖 Literature</option>
+                    <option value="physics">⚛️ Physics</option>
+                    <option value="chemistry">🧪 Chemistry</option>
+                    <option value="biology">🌿 Biology</option>
+                    <option value="computer_science">💻 Computer Science</option>
+                    <option value="psychology">🧠 Psychology</option>
+                    <option value="philosophy">🤔 Philosophy</option>
+                    <option value="economics">💰 Economics</option>
+                    <option value="general">🎯 General Knowledge</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="question">Ask Your Question:</label>
+                <textarea 
+                    id="question" 
+                    name="question" 
+                    placeholder="Type your question here... For example: 'Explain photosynthesis in simple terms' or 'What caused Wantam slogans?'"
+                    required
+                ></textarea>
+            </div>
+            
+            <button type="submit" class="ask-btn" id="askBtn">
+                🚀 Ask AI Tutor
+            </button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Thinking hard about your question...
+        </div>
+        
+        <div class="answer-section" id="answerSection">
+            <div class="answer-header">
+                🤖 AI Tutor's Answer
+                <span class="subject-badge" id="subjectBadge"></span>
+            </div>
+            <div class="answer-box" id="answerBox"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('questionForm');
+        const askBtn = document.getElementById('askBtn');
+        const loading = document.getElementById('loading');
+        const answerSection = document.getElementById('answerSection');
+        const answerBox = document.getElementById('answerBox');
+        const subjectBadge = document.getElementById('subjectBadge');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const subject = document.getElementById('subject').value;
+            const question = document.getElementById('question').value;
+            
+            if (!subject || !question.trim()) {
+                showError('Please select a subject and enter a question!');
+                return;
+            }
+            
+            // Show loading state
+            askBtn.disabled = true;
+            askBtn.textContent = '🤔 Thinking...';
+            loading.style.display = 'block';
+            answerSection.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subject: subject,
+                        question: question
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                showAnswer(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Sorry, I encountered an error. Please try again!');
+            } finally {
+                // Reset button state
+                askBtn.disabled = false;
+                askBtn.textContent = '🚀 Ask AI Tutor';
+                loading.style.display = 'none';
+            }
+        });
+        
+        function showAnswer(data) {
+            answerBox.textContent = data.answer;
+            answerBox.className = 'answer-box fade-in';
+            subjectBadge.textContent = data.subject.charAt(0).toUpperCase() + data.subject.slice(1);
+            answerSection.style.display = 'block';
+            
+            // Smooth scroll to answer
+            answerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function showError(message) {
+            answerBox.textContent = message;
+            answerBox.className = 'answer-box error fade-in';
+            subjectBadge.textContent = 'Error';
+            answerSection.style.display = 'block';
+        }
+        
+        // Auto-resize textarea
+        document.getElementById('question').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+        
+        // Add some fun interactions
+        document.getElementById('subject').addEventListener('change', function() {
+            if (this.value) {
+                const placeholder = getPlaceholderForSubject(this.value);
+                document.getElementById('question').placeholder = placeholder;
+            }
+        });
+        
+        function getPlaceholderForSubject(subject) {
+            const placeholders = {
+                'mathematics': 'e.g., "Explain the quadratic formula and how to use it"',
+                'science': 'e.g., "How does photosynthesis work?"',
+                'history': 'e.g., "What were the main causes of World War II?"',
+                'literature': 'e.g., "What are the main themes in Romeo and Juliet?"',
+                'physics': 'e.g., "Explain Newton\'s laws of motion"',
+                'chemistry': 'e.g., "What happens during a chemical reaction?"',
+                'biology': 'e.g., "How does the human digestive system work?"',
+                'computer_science': 'e.g., "What is the difference between RAM and storage?"',
+                'psychology': 'e.g., "How does memory formation work in the brain?"',
+                'philosophy': 'e.g., "What is the meaning of free will?"',
+                'economics': 'e.g., "How does supply and demand affect prices?"',
+                'general': 'e.g., "Explain any topic you\'re curious about!"'
+            };
+            return placeholders[subject] || 'Type your question here...';
+        }
+    </script>
+</body>
+</html>
