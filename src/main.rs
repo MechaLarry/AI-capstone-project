@@ -47,7 +47,11 @@ async fn main() {
                 .allow_headers(Any),
         );
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    // Get port from environment variable (Render sets PORT)
+    let port = std::env::var("PORT").unwrap_or_else(|_| "3000".to_string());
+    let port: u16 = port.parse().expect("PORT must be a number");
+    
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
     println!("🌐 Server listening on {}", addr);
     
     let listener = tokio::net::TcpListener::bind(addr)
