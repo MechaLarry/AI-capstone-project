@@ -137,4 +137,4 @@ cargo clippy
 
 ## License
 
-MIT
+Larrzone Solutions LTD
